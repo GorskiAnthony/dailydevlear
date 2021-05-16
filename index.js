@@ -6,6 +6,8 @@ require("dotenv").config();
 
 const URL = "https://www.w3schools.com/tags/default.asp";
 const ALL_TAGS = [];
+// At 15:00 on every day-of-week from Monday through Sunday.
+const CRON = "0 0 15 * * 1/1";
 
 const T = new Twit({
   consumer_key: process.env.CONSUMER_KEY,
@@ -26,9 +28,13 @@ function cutTag(tag) {
   const CUT = tag.split(". ")[0];
   return tag === CUT ? tag : `⚠️  ${CUT}`;
 }
+
 let msg = {
-  status: "Hello world!",
+  status: `🤖  Update in progress....
+beep bop bop beep beep
+Update successfully ✅`,
 };
+
 T.post("statuses/update", msg, tweeted);
 
 axios
@@ -54,8 +60,7 @@ axios
         desc = [];
       }
     });
-    /** CRON Task to every 23 hours 59 minutes and 59 second */
-    const JOB = new CronJob("*/59 */59 */23 * * *", () => {
+    const JOB = new CronJob(CRON, () => {
       // get random tags and tweet !
       let random = Math.floor(Math.random() * ALL_TAGS.length);
       const TWEET = ALL_TAGS[random];
@@ -79,6 +84,6 @@ function tweeted(err, data, response) {
   if (err) {
     console.log(err);
   } else {
-    console.log("Done : " + data);
+    console.log(data);
   }
 }
