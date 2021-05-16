@@ -4,7 +4,7 @@ const Twit = require("twit");
 const { cutTag, tweeted } = require("./helpers/functions");
 const getHTML = require("./helpers/axios");
 const config = require("./config");
-const { CRON_TEST } = require("./helpers/const");
+const { CRON } = require("./helpers/const");
 
 // create 2 array for get tag and description
 const ALL_TAGS = [];
@@ -34,7 +34,7 @@ const fetchData = async () => {
     }
   });
 
-  const JOB = new CronJob(CRON_TEST, () => {
+  const JOB = new CronJob(CRON, () => {
     // get random tags and tweet !
     let random = Math.floor(Math.random() * ALL_TAGS.length);
     const TWEET = ALL_TAGS[random];
