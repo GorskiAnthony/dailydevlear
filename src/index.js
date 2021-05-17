@@ -1,53 +1,52 @@
-const cheerio = require("cheerio");
 const CronJob = require("cron").CronJob;
 const Twit = require("twit");
-const { cutTag, tweeted } = require("./helpers/functions");
-const getHTML = require("./helpers/axios");
+const { tweeted } = require("./helpers/functions");
+const { getHTML, getCSS } = require("./helpers/axios");
+const { getCheerio } = require("./helpers/cheerio");
 const config = require("./config");
-const { CRON } = require("./helpers/const");
-
-// create 2 array for get tag and description
-const ALL_TAGS = [];
-let desc = [];
+const { CRON_TEST } = require("./helpers/const");
 
 const T = new Twit(config);
 
 // Check if my app is alive 😅
-console.log("He is alive hahahahahaha");
+console.log("App is run 💪");
 
 const fetchData = async () => {
   const RESPONSE_HTML = await getHTML();
-  const $ = cheerio.load(RESPONSE_HTML);
-  /** for each td in tr do */
-  $("tr td").each((i, info) => {
-    /** refacto info.children[0] */
-    const BASE = info.children[0];
-    const DATAS = BASE.data;
+  const RESPONSE_CSS = await getCSS();
 
-    /** if data get this, else get description */
-    const FINAL = DATAS ? DATAS : cutTag(BASE.children[0].data);
-    desc.push(FINAL);
-    /** i have 2 data, push to ALL_TAGS and reset desc. */
-    if (desc.length % 2 === 0) {
-      ALL_TAGS.push(desc);
-      desc = [];
-    }
-  });
+  const dataHTML = await getCheerio(RESPONSE_HTML);
+  const dataCSS = await getCheerio(RESPONSE_CSS);
 
-  const JOB = new CronJob(CRON, () => {
-    // get random tags and tweet !
-    let random = Math.floor(Math.random() * ALL_TAGS.length);
-    const TWEET = ALL_TAGS[random];
+  const JOB = new CronJob(
+    CRON_TEST,
+    () => {
+      // get random tags and tweet !
+      let nbRandomHTML = Math.floor(Math.random() * dataHTML.length);
+      let nbRandomCSS = Math.floor(Math.random() * dataCSS.length);
+      const TWEET_HTML = dataHTML[nbRandomHTML];
+      const TWEET_CSS = dataCSS[nbRandomCSS];
+      console.log(TWEET_HTML);
 
-    let tweet = `It's time to learn HTML !
+      let tweet = `It's time to learn HTML ! 📝
 
-Tag : ${TWEET[0]}
-Description: ${TWEET[1]}.
+Tag : ${TWEET_HTML[0]}
+Description: ${TWEET_HTML[1]}.
+
+And learn CSS ! 💅
+
+Attribute: ${TWEET_CSS[0]}
+Description : ${TWEET_CSS[1]}.
       `;
 
-    T.post("statuses/update", { status: tweet }, tweeted);
-    //console.log(tweet);
-  });
+      //T.post("statuses/update", { status: tweet }, tweeted);
+      console.log(`I have tweeted !
+      ${tweet}`);
+    },
+    null,
+    true,
+    "Europe/Paris"
+  );
 
   /** run my function */
   JOB.start();
