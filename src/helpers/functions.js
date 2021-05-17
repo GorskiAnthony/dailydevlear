@@ -18,7 +18,12 @@ const tweeted = (err, data, response) => {
   }
 };
 
+const random = (max) => {
+  return Math.floor(Math.random() * max);
+};
+
 module.exports = {
   cutTag,
   tweeted,
+  random,
 };

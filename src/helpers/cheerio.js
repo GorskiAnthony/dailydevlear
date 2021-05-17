@@ -1,12 +1,12 @@
 const cheerio = require("cheerio");
 const { cutTag } = require("./functions");
 
-// create 2 array for get tag and description
-const ALL_TAGS = [];
-let desc = [];
-
 /** get cheerio data  */
 const getCheerio = async (data) => {
+  // create 2 array for get tag and description
+  const ALL_TAGS = [];
+  let desc = [];
+
   const $ = cheerio.load(data);
   /** for each td in tr do */
   $("tr td").each((i, info) => {

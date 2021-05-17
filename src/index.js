@@ -1,10 +1,10 @@
 const CronJob = require("cron").CronJob;
 const Twit = require("twit");
-const { tweeted } = require("./helpers/functions");
+const { tweeted, random } = require("./helpers/functions");
 const { getHTML, getCSS } = require("./helpers/axios");
 const { getCheerio } = require("./helpers/cheerio");
 const config = require("./config");
-const { CRON_TEST } = require("./helpers/const");
+const { CRON } = require("./helpers/cron");
 
 const T = new Twit(config);
 
@@ -15,18 +15,18 @@ const fetchData = async () => {
   const RESPONSE_HTML = await getHTML();
   const RESPONSE_CSS = await getCSS();
 
-  const dataHTML = await getCheerio(RESPONSE_HTML);
   const dataCSS = await getCheerio(RESPONSE_CSS);
+  const dataHTML = await getCheerio(RESPONSE_HTML);
 
   const JOB = new CronJob(
-    CRON_TEST,
+    CRON,
     () => {
       // get random tags and tweet !
-      let nbRandomHTML = Math.floor(Math.random() * dataHTML.length);
-      let nbRandomCSS = Math.floor(Math.random() * dataCSS.length);
+      let nbRandomHTML = random(dataHTML.length);
+      let nbRandomCSS = random(dataCSS.length);
       const TWEET_HTML = dataHTML[nbRandomHTML];
       const TWEET_CSS = dataCSS[nbRandomCSS];
-      console.log(TWEET_HTML);
+      //console.log(TWEET_HTML);
 
       let tweet = `It's time to learn HTML ! 📝
 
@@ -39,9 +39,8 @@ Attribute: ${TWEET_CSS[0]}
 Description : ${TWEET_CSS[1]}.
       `;
 
-      //T.post("statuses/update", { status: tweet }, tweeted);
-      console.log(`I have tweeted !
-      ${tweet}`);
+      T.post("statuses/update", { status: tweet }, tweeted);
+      console.log(tweet);
     },
     null,
     true,
